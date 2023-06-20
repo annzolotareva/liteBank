@@ -14,8 +14,8 @@ val logbackVersion = "1.2.3"
 
 lazy val root = (project in file("."))
   .settings(
-    name := "operations",
-    Compile / run / mainClass := Some("misis.OperationApp"),
+    name := "cashbacks",
+    Compile / run / mainClass := Some("misis.TempApp"),
     libraryDependencies ++= Seq(
       // JSON
       "io.circe" %% "circe-core" % circeVersion,
@@ -38,5 +38,6 @@ lazy val root = (project in file("."))
       // scalaTest % Test
     )
   )
+
 
 enablePlugins(JavaAppPackaging)

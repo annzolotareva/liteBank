@@ -10,9 +10,8 @@ import scala.concurrent.ExecutionContext
 
 class Route(implicit ec: ExecutionContext) extends FailFastCirceSupport {
 
-  def routes =
-    (path("hello") & get) {
-      complete("ok")
-    }
+    def routes =
+        (path("hello") & get) {
+            complete("ok")
+        }
 }
-

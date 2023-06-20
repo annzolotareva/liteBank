@@ -1,28 +1,31 @@
-###
-POST localhost:8071/update/1/1234
+//Создание 1 аккаунта
+curl --header "Content-Type: application/json" \
+--request POST \
+--data '{
+          "initialAmount": 100,
+          "category": "first"
+        }' \
+http://localhost:8010/account HTTP/1.1
 
-###
-POST localhost:8071/update/2/284
+//Создание 2 аккаунта
+curl --header "Content-Type: application/json" \
+--request POST \
+--data '{
+          "initialAmount": 2000,
+          "category": "second"
+        }' \
+http://localhost:8003/account HTTP/1.1
 
-###
-POST localhost:8071/update/3/4564
+//Перевод денег с 1 на 2 аккаунт
+curl --header "Content-Type: application/json" \
+--request POST \
+--data '{
+          "sourceId": 1,
+          "destinationId": 2,
+          "value": 5000
+        }' \
+http://localhost:8003/transfer HTTP/1.1
 
-###
-POST localhost:8071/transfer
-Content-Type: application/json
 
-{
-  "sourceId": 1,
-  "destinationId": 2,
-  "value": 234
-}
 
-###
-POST localhost:8071/transfer
-Content-Type: application/json
 
-{
-  "sourceId": 2,
-  "destinationId": 3,
-  "value": 2347
-}

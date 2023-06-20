@@ -1,46 +1,68 @@
 version: '3.1'
 
+volumes:
+  pgadmin_data: {}
+
 services:
-  db:
-    image: postgres:9.6
-    environment:
-      POSTGRES_PASSWORD: 1111
+  account-service-first:
+    image: account-service-first
+    env_file: .env
+    container_name: account-service-first
+    build:
+      dockerfile: Dockerfile.accountService
+      context: ./
     ports:
-      - 5434:5432
-    networks:
-      - misis-local
+      - "8001:8081"
 
-  rabbitmq:
-    image: rabbitmq:3-management
-    environment:
-      RABBITMQ_DEFAULT_USER: user
-      RABBITMQ_DEFAULT_PASS: password
-    ports:
-      - 15672:15672
-      - 5672:5672
-    networks:
-      - misis-local
+  account-service-second:
+      image: account-service-second
+      env_file: .env2
+      container_name: account-service-second
+      build:
+        dockerfile: Dockerfile.accountService
+        context: ./
+      ports:
+        - "8002:8081"
 
-  elasticsearch:
-    image: elasticsearch:7.9.3
-    environment:
-      discovery.type: single-node
+  operations-service-first:
+    container_name: operations-service-first
+    image: operations-service-first
+    env_file: .env
     ports:
-      - 9200:9200
-    networks:
-      - misis-local
+      - "8003:8081"
+    build:
+      context: ./
+      dockerfile: Dockerfile.operationService
+
+  fees-service-first:
+      container_name: fees-service-first
+      image: fees-service-first
+      env_file: .env
+      ports:
+        - "8004:8081"
+      build:
+        context: ./
+        dockerfile: Dockerfile.feesService
+
+  cashbacks-service-first:
+      container_name: cashbacks-service-first
+      image: cashbacks-service-first
+      env_file: .env
+      ports:
+        - "8005:8081"
+      build:
+        context: ./
+        dockerfile: Dockerfile.cashbackService
 
   zookeeper:
     image: wurstmeister/zookeeper
     ports:
       - "2181:2181"
-    networks:
-      - misis-local
 
   kafka:
     image: wurstmeister/kafka
     ports:
-      - 9094:9094
+      - "9094:9094"
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
@@ -50,23 +72,4 @@ services:
       KAFKA_ADVERTISED_HOSTNAME: INSIDE
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: INSIDE
-    networks:
-      - misis-local
 
-  fun-cart:
-    image: misis-fun-cart
-    container_name: misis-fun-cart
-    build:
-      dockerfile: docker/Dockerfile
-      context: ./
-    environment:
-      PGHOST: db
-      PGPORT: 5432
-    ports:
-      - 8080:8080
-    networks:
-      - misis-local
-
-
-networks:
-  misis-local:

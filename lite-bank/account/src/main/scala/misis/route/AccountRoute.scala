@@ -1,9 +1,7 @@
 package misis.route
 
-import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.Directives._
 import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport
-import io.circe.generic.auto._
 
 import scala.concurrent.ExecutionContext
 

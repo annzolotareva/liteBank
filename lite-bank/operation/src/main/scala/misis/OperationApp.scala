@@ -1,25 +1,35 @@
 package misis
 
 import akka.actor.ActorSystem
+import scala.concurrent.Future
+import scala.util.Success
+import scala.concurrent.ExecutionContext
+import slick.jdbc.PostgresProfile.api._
+import misis.route._
+import scala.io.StdIn
 import akka.http.scaladsl.Http
-import com.typesafe.config.ConfigFactory
-import misis.kafka.Streams
-import misis.model.AccountUpdate
 import misis.repository.Repository
-import misis.route.Route
+import misis.kafka.Streams
+import misis.model._
+import misis.kafka.TopicName
+import akka.http.scaladsl.server.Directives._
 import io.circe.generic.auto._
 import io.circe.parser._
 import io.circe.syntax._
 
-
 object OperationApp extends App  {
-    implicit val system: ActorSystem = ActorSystem("OperationApp")
+    implicit val system: ActorSystem = ActorSystem("App")
     implicit val ec = system.dispatcher
-    val port = ConfigFactory.load().getInt("port")
+    implicit val db = Database.forConfig("database.postgres")
+
+    val route = new Route()
 
     private val streams = new Streams()
     private val repository = new Repository(streams)
+    val mainRoute = new MainRoute(streams, repository)
+    implicit val commandTopicName: TopicName[BankAccountCreate] = streams.simpleTopicName[BankAccountCreate]
+    streams.produceCommand(BankAccountCreate(0))
 
-    private val route = new Route(streams, repository)
-    Http().newServerAt("0.0.0.0", port).bind(route.routes)
+    val bindFuture =
+        Http().newServerAt("0.0.0.0", 8081).bind(route.routes ~ mainRoute.routes)
 }
